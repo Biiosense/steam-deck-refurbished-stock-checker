@@ -9,10 +9,14 @@ import os
 import requests
 import logging 
 from datetime import datetime
+from pathlib import Path
 
 # Configurations
-webhook_url = "https://discord.com/api/webhooks/1392809397280964740/zJwaI96qRjZNrPmPRZGmR63XJwJ9bS9TDtE79LnkWp9CyyNOwCNW9abATHGqJTSJ8LUq"
+base_dir = Path(__file__).resolve().parent
+webhook_url = os.getenv("STEAMDECK_WEBHOOK")
 page_url = "https://store.steampowered.com/sale/steamdeckrefurbished/" 
+log_file = os.path.join(base_dir,"steamdeck.log")
+archive_dir = os.path.join(base_dir,"screenshots")
 debug = False # Set to True to always send a notification with a screenshot
 
 # Set up Selenium WebDriver options
@@ -24,7 +28,7 @@ service = Service("/usr/bin/chromedriver")  # Update with the correct path to yo
 
 ## Setup logging
 logging.basicConfig(
-    filename='/home/Max/GitHome/steam-deck-refurbished-stock-checker/steamdeck.log',
+    filename=log_file,
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%D %H:%M:%S'
@@ -40,7 +44,7 @@ try:
         raise
 
     # Wait for page to load dynamic content
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "ImpressionTrackedElement")))
+    WebDriverWait(driver, 50).until(EC.visibility_of_element_located((By.CLASS_NAME, "ImpressionTrackedElement")))
     time.sleep(10)  # Extra wait to ensure all dynamic content is fully loaded
 
     # Set the window size to capture the full page
@@ -51,7 +55,6 @@ try:
     add_to_cart_count = page_source.lower().count("add to cart")
 
     # Prepare screenshot archive directory
-    archive_dir = '/home/Max/GitHome/steam-deck-refurbished-stock-checker/screenshots'
     os.makedirs(archive_dir, exist_ok=True)
 
     # Register name of the screenshot
