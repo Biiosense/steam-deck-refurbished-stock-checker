@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python3 /root/steam_deck_stock_checker/checker.py
+dir=/home/Max/GitHome/steam-deck-refurbished-stock-checker
+${dir}/venv/bin/python ${dir}/checker.py >> ${dir}/steamdeck.log 2>&1
+
